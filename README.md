@@ -20,6 +20,7 @@ The project was built as a practical exercise in using JavaScript to create a co
 - Export transactions as CSV
 - Restore sample data or clear stored data
 - Persistent storage using `localStorage`
+- Included PowerShell server script for running the project locally
 - Dynamic toast notifications and confirmation dialogs
 - Fictional advertisement area with rotating content and dismissal
 - Responsive layout for desktop, tablet and mobile
@@ -70,14 +71,99 @@ This makes the project a practical exercise in client-side data persistence, ser
 Clone the repository:
 
 ```
-git clone https://github.com/RahulRanjan67/SpendWise.git
-cd SpendWise
+git clone https://github.com/RahulRanjan67/Spendwise.git
+cd Spendwise
 ```
 
-Open the project through a local development server, such as VS Code Live Server.
-No backend, database or external service is required.
+Open the project through a local development server.
+No backend, database, build step or external service is required.
 
-The app is built with ES modules, and browsers block modules from loading over the `file://` protocol. Opening `index.html` by double-clicking it will show a blank, non-functional page, so it needs to be served over `http://` through a local server.
+### Why a server is needed
+
+The app is built with ES modules, and browsers block modules from loading over the `file://` protocol.
+Opening `index.html` by double-clicking it shows a blank, non-functional page, so the folder has to be served over `http://`.
+
+This is a browser security rule rather than a fault in the project.
+A page loaded from `file://` is treated as coming from an unknown origin, and the browser refuses to fetch the module files from it.
+If `index.html` is opened this way, the page detects it and displays a warning explaining the same thing.
+
+### What changed
+
+Earlier versions of this project relied on a separate tool such as VS Code Live Server to provide the local server.
+That worked, but it meant the project could not be run until an extra editor extension was installed and configured.
+
+The project now includes `serve.ps1`, a small server script written in PowerShell.
+PowerShell is already part of Windows, so cloning the repository is now enough to run the application. No extension, no installation and no configuration are required.
+
+The application code itself was not changed by this.
+`index.html`, the CSS and all JavaScript modules are exactly as they were, and the server script simply reads those files from disk and sends them to the browser over `http://`.
+
+What the script does:
+
+* Serves the project folder over `http://localhost:5500`
+* Sends each file with the correct content type, so the browser accepts the ES modules
+* Returns `404` for a file that does not exist
+* Blocks requests that try to reach files outside the project folder
+* Listens on `localhost` only, so the project is not exposed to the local network
+
+Live Server and Python still work as alternatives, and are listed below.
+
+### Option 1: PowerShell (no installation required)
+
+`serve.ps1` is included. PowerShell ships with Windows, so nothing needs to be installed.
+
+Open PowerShell in the project folder and run:
+
+```
+.\serve.ps1
+```
+
+Then open:
+
+```
+http://localhost:5500
+```
+
+Stop the server with `Ctrl+C`.
+
+To use a different port, pass it as an argument:
+
+```
+.\serve.ps1 8080
+```
+
+**If PowerShell refuses to run the script**
+
+Some Windows installations block `.ps1` files by default, which produces an error mentioning `execution policy`.
+Allow the script for the current window only, then run it again:
+
+```
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+This affects only that window and closes when it is closed, so nothing permanent is changed on the machine.
+
+The same applies when the script is run without entering the folder first:
+
+```
+powershell -ExecutionPolicy Bypass -File .\serve.ps1
+```
+
+### Option 2: VS Code Live Server
+
+With the Live Server extension installed, right-click `index.html` and choose **Open with Live Server**.
+
+### Option 3: Python
+
+If Python is already installed:
+
+```
+python -m http.server 5500
+```
+
+Then open `http://localhost:5500`.
+
+All three options work because they serve the folder over `http://` in the same way.
 
 ## Future Scope
 

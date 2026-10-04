@@ -15,7 +15,7 @@
                 document.body.insertBefore(d,document.body.firstChild)
             }
             if(location.protocol==="file:"){
-                showerr("This page will not work opened directly from disk. Serve this folder through a local server (for example VS Code Live Server) and open it over http, not file://.")
+                showerr("This page will not work opened directly from disk, because browsers block ES modules on the file:// protocol. Serve the folder over http instead. On Windows, run serve.ps1 in PowerShell (right-click the file, choose Run with PowerShell), or use VS Code Live Server. Then open http://localhost:5500.")
             }
             window.addEventListener("error",function(e){
                 if(e.target&&e.target.tagName==="SCRIPT"){
